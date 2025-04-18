@@ -1,52 +1,58 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { MessageCircle, ThumbsUp, Vote } from "lucide-react"
-import { getRandomAnimalEmoji } from "@/lib/emoji-utils"
-import { formatDistanceToNow } from "@/lib/date-utils"
-import { getPosts } from "@/lib/api"
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { MessageCircle, ThumbsUp, Vote } from 'lucide-react';
+import { getRandomAnimalEmoji } from '@/lib/emoji-utils';
+import { formatDistanceToNow } from '@/lib/date-utils';
+import { getPosts } from '@/lib/api';
 
 type Post = {
-  id: string
-  title: string
-  content: string
-  created_at: string
-  anonymous_name: string
-  tags: string[]
-  likes: number
-  comments_count: number
-  has_poll: boolean
-}
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  anonymous_name: string;
+  tags: string[];
+  likes: number;
+  comments_count: number;
+  has_poll: boolean;
+};
 
 export default function PostList() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const searchParams = useSearchParams()
-  const tagFilter = searchParams.get("tag")
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const tagFilter = searchParams.get('tag');
 
   useEffect(() => {
     async function fetchPosts() {
-      setLoading(true)
+      setLoading(true);
       try {
-        const data = await getPosts(tagFilter)
-        setPosts(data)
+        const data = await getPosts(tagFilter);
+        setPosts(data);
       } catch (error) {
-        console.error("Error fetching posts:", error)
-        setPosts([])
+        console.error('Error fetching posts:', error);
+        setPosts([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchPosts()
-  }, [tagFilter])
+    fetchPosts();
+  }, [tagFilter]);
 
   if (loading) {
-    return <div className="flex justify-center py-8">로딩 중...</div>
+    return <div className="flex justify-center py-8">로딩 중...</div>;
   }
 
   if (posts.length === 0) {
@@ -54,16 +60,19 @@ export default function PostList() {
       <div className="text-center py-12">
         <p className="text-muted-foreground mb-4">아직 게시글이 없어요!</p>
         <Link href="/create">
-          <Badge variant="outline" className="cursor-pointer hover:bg-secondary">
+          <Badge
+            variant="outline"
+            className="cursor-pointer hover:bg-secondary"
+          >
             첫 게시글 작성하기
           </Badge>
         </Link>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col space-y-4">
       {posts.map((post) => (
         <Link href={`/post/${post.id}`} key={post.id}>
           <Card className="hover:border-primary/50 transition-all cursor-pointer">
@@ -86,13 +95,17 @@ export default function PostList() {
               </div>
             </CardHeader>
             <CardContent className="pb-2">
-              <p className="line-clamp-2 text-muted-foreground">{post.content}</p>
+              <p className="line-clamp-2 text-muted-foreground">
+                {post.content}
+              </p>
             </CardContent>
             <CardFooter className="pt-2 flex justify-between text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <span>{getRandomAnimalEmoji(post.anonymous_name)}</span>
                 <span>{post.anonymous_name}</span>
-                <span className="text-xs">• {formatDistanceToNow(post.created_at)}</span>
+                <span className="text-xs">
+                  • {formatDistanceToNow(post.created_at)}
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
@@ -109,6 +122,5 @@ export default function PostList() {
         </Link>
       ))}
     </div>
-  )
+  );
 }
-
